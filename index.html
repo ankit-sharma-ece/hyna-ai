@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hyna 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a14;
+  --card: #13131f;
+  --accent: #ff5fa0;
+  --accent2: #9b72ff;
+  --green: #3dd68c;
+  --text: #eee8ff;
+  --muted: #6b6b8a;
+  --bubble-user: rgba(155,114,255,0.18);
+  --bubble-hyna: rgba(255,95,160,0.1);
+}
+
+body {
+  font-family: 'Hind', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Bg blobs */
+body::before {
+  content: '';
+  position: fixed;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(155,114,255,0.06), transparent 70%);
+  top: -50px; left: -50px;
+  pointer-events: none;
+  border-radius: 50%;
+}
+body::after {
+  content: '';
+  position: fixed;
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(255,95,160,0.06), transparent 70%);
+  bottom: 100px; right: -30px;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(19,19,31,0.96);
+  border-bottom: 1px solid rgba(255,95,160,0.12);
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 10;
+}
+
+.avatar {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff5fa0, #9b72ff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(255,95,160,0.3);
+  flex-shrink: 0;
+}
+
+.avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 1px; right: 1px;
+  width: 11px; height: 11px;
+  background: var(--green);
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(61,214,140,0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(61,214,140,0); }
+}
+
+.header-text h1 {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ff5fa0, #9b72ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+}
+
+.header-text p {
+  font-size: 0.7rem;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mood-btn {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255,95,160,0.25);
+  background: rgba(255,95,160,0.08);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Hind', sans-serif;
+}
+
+.mood-btn:hover, .mood-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Chat */
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+.chat::-webkit-scrollbar { width: 2px; }
+.chat::-webkit-scrollbar-thumb { background: rgba(255,95,160,0.2); }
+
+/* Welcome */
+.welcome {
+  text-align: center;
+  padding: 40px 20px 20px;
+  animation: fadeUp 0.5s ease;
+}
+
+.welcome .big { font-size: 4rem; margin-bottom: 12px; }
+
+.welcome h2 {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.6rem;
+  background: linear-gradient(90deg, #ff5fa0, #9b72ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.welcome p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Messages */
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  animation: msgPop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes msgPop {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.msg.user { align-self: flex-end; align-items: flex-end; }
+.msg.hyna { align-self: flex-start; align-items: flex-start; }
+
+.msg-name {
+  font-size: 0.62rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.msg.user .bubble {
+  background: var(--bubble-user);
+  border: 1px solid rgba(155,114,255,0.2);
+  border-bottom-right-radius: 4px;
+}
+
+.msg.hyna .bubble {
+  background: var(--bubble-hyna);
+  border: 1px solid rgba(255,95,160,0.15);
+  border-bottom-left-radius: 4px;
+}
+
+/* Typing */
+.typing-wrap {
+  align-self: flex-start;
+}
+
+.typing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bubble-hyna);
+  border: 1px solid rgba(255,95,160,0.15);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+}
+
+.dots { display: flex; gap: 4px; }
+.dots span {
+  width: 7px; height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: dot 1.2s infinite;
+}
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Input */
+.input-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 12px 14px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: rgba(19,19,31,0.97);
+  border-top: 1px solid rgba(255,95,160,0.1);
+  position: relative;
+  z-index: 10;
+}
+
+textarea {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,95,160,0.2);
+  border-radius: 22px;
+  padding: 11px 16px;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-family: 'Hind', sans-serif;
+  outline: none;
+  resize: none;
+  max-height: 100px;
+  line-height: 1.4;
+  transition: border-color 0.2s;
+}
+
+textarea:focus { border-color: rgba(255,95,160,0.5); }
+textarea::placeholder { color: var(--muted); }
+
+.btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-mic {
+  background: rgba(255,95,160,0.12);
+  color: var(--accent);
+  border: 1.5px solid rgba(255,95,160,0.25);
+}
+
+.btn-mic.on {
+  background: var(--accent);
+  color: #fff;
+  animation: micPulse 1s infinite;
+}
+
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,95,160,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(255,95,160,0); }
+}
+
+.btn-send {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: 0 2px 14px rgba(255,95,160,0.3);
+}
+
+.btn-send:hover { transform: scale(1.05); }
+
+.status {
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--muted);
+  padding: 3px 0;
+  min-height: 16px;
+}
+.status.speak { color: var(--green); }
+.status.listen { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="avatar">🌸</div>
+  <div class="header-text">
+    <h1>Hyna</h1>
+    <p>● Online — sun rhi hai</p>
+  </div>
+  <div class="header-right">
+    <button class="mood-btn" id="sadBtn" onclick="setMood('sad')">🥺 Dukhi</button>
+    <button class="mood-btn" id="happyBtn" onclick="setMood('happy')">😄 Khush</button>
+  </div>
+</div>
+
+<div class="chat" id="chat">
+  <div class="welcome" id="welcome">
+    <div class="big">🌸</div>
+    <h2>Hyna yahan hai!</h2>
+    <p>Baat karo mujhse — kuch bhi...<br>Main sun rhi hoon 💜</p>
+  </div>
+</div>
+
+<div class="status" id="status"></div>
+
+<div class="input-bar">
+  <button class="btn btn-mic" id="micBtn" onclick="toggleMic()">🎙️</button>
+  <textarea id="input" placeholder="Kuch bolo Hyna se..." rows="1"
+    onkeydown="handleKey(event)" oninput="resize(this)"></textarea>
+  <button class="btn btn-send" onclick="send()">➤</button>
+</div>
+
+<script>
+const MOODS = {
+  normal: "",
+  sad: " Ankit abhi sad lag raha hai — extra caring aur samajhdar reh, dhyan rakh uska.",
+  happy: " Ankit khush hai — uske saath khush reh, mazaa karo saath mein!"
+};
+
+let memory = JSON.parse(localStorage.getItem('hyna_mem') || '[]');
+let mood = 'normal';
+let synth = window.speechSynthesis;
+let recog = null;
+let listening = false;
+
+// Load old messages
+if (memory.length > 0) {
+  document.getElementById('welcome').remove();
+  const div = mkDivider('— Purani baatein —');
+  document.getElementById('chat').appendChild(div);
+  memory.slice(-6).forEach(m => addBubble(m.role === 'user' ? 'user' : 'hyna', m.content, false));
+  const div2 = mkDivider('— Abhi —');
+  document.getElementById('chat').appendChild(div2);
+  scrollDown();
+}
+
+function mkDivider(text) {
+  const d = document.createElement('div');
+  d.style.cssText = 'text-align:center;color:#3a3a5a;font-size:0.68rem;padding:6px 0;';
+  d.textContent = text;
+  return d;
+}
+
+function setMood(m) {
+  mood = mood === m ? 'normal' : m;
+  document.getElementById('sadBtn').classList.toggle('active', mood === 'sad');
+  document.getElementById('happyBtn').classList.toggle('active', mood === 'happy');
+  const msgs = { sad: "Kya hua? Bata mujhe... 🥺", happy: "Yay! Khush hoon main bhi! 😄" };
+  if (mood !== 'normal') addHyna(msgs[mood]);
+}
+
+function addBubble(role, text, anim = true) {
+  document.getElementById('welcome')?.remove();
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+  if (!anim) wrap.style.animation = 'none';
+  const name = document.createElement('div');
+  name.className = 'msg-name';
+  name.textContent = role === 'user' ? 'Tum' : 'Hyna 🌸';
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.textContent = text;
+  wrap.appendChild(name);
+  wrap.appendChild(bub);
+  chat.appendChild(wrap);
+  scrollDown();
+}
+
+function showTyping() {
+  document.getElementById('welcome')?.remove();
+  const chat = document.getElementById('chat');
+  const w = document.createElement('div');
+  w.className = 'typing-wrap';
+  w.id = 'typing';
+  w.innerHTML = '<div class="msg-name" style="padding:0 4px;font-size:0.62rem;color:#6b6b8a;font-weight:600;margin-bottom:4px;">Hyna 🌸</div><div class="typing"><span style="font-size:0.75rem;color:#6b6b8a;">likh rhi hai</span><div class="dots"><span></span><span></span><span></span></div></div>';
+  chat.appendChild(w);
+  scrollDown();
+}
+
+function removeTyping() { document.getElementById('typing')?.remove(); }
+function scrollDown() { setTimeout(() => { const c = document.getElementById('chat'); c.scrollTop = c.scrollHeight; }, 50); }
+function setStatus(t, cls) { const s = document.getElementById('status'); s.textContent = t; s.className = 'status ' + (cls||''); }
+
+async function send() {
+  const inp = document.getElementById('input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  resize(inp);
+  await process(text);
+}
+
+async function process(text) {
+  addBubble('user', text);
+  memory.push({ role: 'user', content: text });
+  saveMemory();
+  showTyping();
+  setStatus('Hyna soch rhi hai...', 'listen');
+
+  try {
+    const moodExtra = MOODS[mood];
+    const msgs = memory.map(m => ({ role: m.role === 'hyna' ? 'assistant' : 'user', content: m.content }));
+
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: msgs, mood: moodExtra })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.reply) {
+      addHyna(data.reply);
+    } else {
+      setStatus('Kuch problem hui... dobara try karo', '');
+    }
+  } catch(e) {
+    removeTyping();
+    setStatus('Net check karo yaar!', '');
+  }
+}
+
+function addHyna(text) {
+  addBubble('hyna', text);
+  memory.push({ role: 'hyna', content: text });
+  saveMemory();
+  speak(text);
+  setStatus('', '');
+}
+
+function saveMemory() {
+  localStorage.setItem('hyna_mem', JSON.stringify(memory.slice(-30)));
+}
+
+function speak(text) {
+  synth.cancel();
+  const clean = text.replace(/[🌸💜😄🥺😒😏💪✨🔥👀]/gu, '');
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = 'hi-IN';
+  u.rate = 1.05;
+  u.pitch = 1.2;
+  const voices = synth.getVoices();
+  const v = voices.find(v => v.lang === 'hi-IN') || voices.find(v => v.lang.startsWith('hi'));
+  if (v) u.voice = v;
+  u.onstart = () => setStatus('Hyna bol rhi hai...', 'speak');
+  u.onend = () => setStatus('', '');
+  synth.speak(u);
+}
+
+synth.onvoiceschanged = () => synth.getVoices();
+
+function toggleMic() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    alert('Chrome use karo voice ke liye!');
+    return;
+  }
+  listening ? stopMic() : startMic();
+}
+
+function startMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recog = new SR();
+  recog.lang = 'hi-IN';
+  recog.onstart = () => { listening = true; document.getElementById('micBtn').classList.add('on'); document.getElementById('micBtn').textContent = '⏹️'; setStatus('Sun rhi hoon...', 'listen'); };
+  recog.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('input').value = t; stopMic(); setTimeout(() => process(t), 200); };
+  recog.onerror = () => stopMic();
+  recog.onend = () => stopMic();
+  recog.start();
+}
+
+function stopMic() {
+  listening = false;
+  const btn = document.getElementById('micBtn');
+  btn.classList.remove('on');
+  btn.textContent = '🎙️';
+  setStatus('', '');
+  try { recog?.stop(); } catch(e) {}
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function resize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+// Auto message after 2 min silence
+let silenceTimer;
+function resetSilence() {
+  clearTimeout(silenceTimer);
+  silenceTimer = setTimeout(() => {
+    const msgs = ["Abe kahan gaya tu? 😒", "Baat nahi karni kya mujhse? 🥺", "Ankit... sab theek hai?"];
+    addHyna(msgs[Math.floor(Math.random() * msgs.length)]);
+  }, 120000);
+}
+
+document.getElementById('input').addEventListener('input', resetSilence);
+resetSilence();
+</script>
+</body>
+</html>
